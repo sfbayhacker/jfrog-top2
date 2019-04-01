@@ -78,7 +78,6 @@ public class HttpUtils {
             status = client.executeMethod( get );
             if (logger.isDebugEnabled()) logger.debug("status :: " + status);
             if (status == 200) {
-                logger.debug("status is OK");
                 // print the status and response
                 InputStream is = get.getResponseBodyAsStream();
                 content = IOUtils.toString(is, "UTF-8");

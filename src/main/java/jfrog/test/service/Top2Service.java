@@ -7,10 +7,12 @@ import jfrog.test.util.HttpUtils;
 import jfrog.test.util.Pair;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * Service for finding top 2 artifacts in a repository
@@ -29,24 +31,9 @@ public class Top2Service {
      * @return 
      */
     public List<Pair<String, Integer>> findTop2(String repo, String apiKey) {
-        String payload = String.format("items.find(\n" +
-            "{\n" +
-            "\"repo\":{\"$eq\":\"%s\"}\n" +
-            "}\n" +
-            ").include(\"path\", \"name\", \"stat.downloads\")", repo);
+        List<Pair<String, Integer>> artifacts = getArtifactsData(repo, apiKey);
         
-        String url = "https://jfrog.local/artifactory/api/search/aql";
-        String response = null;
-        List<Pair<String, Integer>> artifacts = null;
-        try {
-            response = HttpUtils.postRequest(url, apiKey, payload);
-            artifacts = getPathInfo(response);
-        } catch (Exception ex) {
-            logger.error("Error while fetching artifact list", ex);
-            return null;
-        }
-        
-        if (artifacts == null || artifacts.isEmpty()) return null;
+        if (artifacts == null || artifacts.isEmpty()) return Collections.EMPTY_LIST;
         
         Pair<String, Integer> first = null;
         Pair<String, Integer> second = null;
@@ -89,7 +76,30 @@ public class Top2Service {
         return result;
     }
     
+    private List<Pair<String, Integer>> getArtifactsData(String repo, String apiKey) {
+        if (StringUtils.isEmpty(repo) || StringUtils.isEmpty(apiKey)) return null;
+        String payload = String.format("items.find(\n" +
+            "{\n" +
+            "\"repo\":{\"$eq\":\"%s\"}\n" +
+            "}\n" +
+            ").include(\"path\", \"name\", \"stat.downloads\")", repo);
+        
+        String url = "https://jfrog.local/artifactory/api/search/aql";
+        String response = null;
+        List<Pair<String, Integer>> artifacts = null;
+        try {
+            response = HttpUtils.postRequest(url, apiKey, payload);
+            artifacts = getPathInfo(response);
+        } catch (Exception ex) {
+            logger.error("Error while fetching artifact list", ex);
+            return null;
+        }
+        
+        return artifacts;
+    }
+    
     private List<Pair<String, Integer>> getPathInfo(String artifacts) throws IOException {
+        if (artifacts == null) return null;
         ObjectMapper mapper = new ObjectMapper();
         JsonNode tree = mapper.readTree(artifacts);
         JsonNode results = tree.get("results");

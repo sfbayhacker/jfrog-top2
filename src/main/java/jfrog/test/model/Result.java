@@ -1,17 +1,19 @@
 package jfrog.test.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jfrog.test.util.Pair;
 
 /**
  *
  * @author arun
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result {
 
     private String first;
-    private int firstDownloads;
+    private Integer firstDownloads;
     private String second;
-    private int secondDownloads;
+    private Integer secondDownloads;
 
     public Result(Pair<String, Integer> first, Pair<String, Integer> second) {
         if (first != null) {
@@ -33,11 +35,11 @@ public class Result {
         this.first = first;
     }
 
-    public int getFirstDownloads() {
+    public Integer getFirstDownloads() {
         return firstDownloads;
     }
 
-    public void setFirstDownloads(int firstDownloads) {
+    public void setFirstDownloads(Integer firstDownloads) {
         this.firstDownloads = firstDownloads;
     }
 
@@ -49,11 +51,11 @@ public class Result {
         this.second = second;
     }
 
-    public int getSecondDownloads() {
+    public Integer getSecondDownloads() {
         return secondDownloads;
     }
 
-    public void setSecondDownloads(int secondDownloads) {
+    public void setSecondDownloads(Integer secondDownloads) {
         this.secondDownloads = secondDownloads;
     }
 }
